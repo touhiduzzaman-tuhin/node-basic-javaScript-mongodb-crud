@@ -3,6 +3,7 @@ const MongoClient = require('mongodb').MongoClient;
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const ObjectId = require('mongodb').ObjectID;
+require('dotenv').config()
 
 const app = express();
 app.use(cors());
@@ -16,11 +17,8 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html')
 })
 
-// const name = crudUser
-// const pass = znXi7XgQEYLH63jq
-// dbname = userInformation
 
-const uri = "mongodb+srv://crudUser:znXi7XgQEYLH63jq@cluster0.bjf0d.mongodb.net/userInformation?retryWrites=true&w=majority";
+const uri = `mongodb+srv://${process.env.DB_NAME}:${process.env.DB_PASS}@cluster0.bjf0d.mongodb.net/${process.env.DB_COLLECTION}?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 client.connect(err => {
   const userCollection = client.db("userInformation").collection("users");

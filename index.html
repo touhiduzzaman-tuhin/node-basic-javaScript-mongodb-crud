@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Crud</title>
+</head>
+
+<body align='center'>
+    <h3>User Information Form</h3>
+
+    <form action="/addUser" method="post">
+        <input type="text" name="name" id="" placeholder="Enter Name">
+        <br> <br>
+        <input type="email" name='email' id='' placeholder="Enter Email">
+        <br> <br>
+        <input type="tel" name="phone" id="" placeholder="Enter Phone">
+        <br> <br>
+        <input type="submit" value="Add User">
+
+    </form>
+
+    <div id='userList'>
+
+    </div>
+
+    <div id='updateUser'>
+
+    </div>
+
+    <script>
+        function loadAllUsers() {
+            fetch('/users')
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    const container = document.getElementById('userList');
+                    container.innerHTML = '';
+
+                    data.forEach(user => {
+                        const people = document.createElement('p');
+                        people.innerHTML = `<strong>Name : ${user.name}</strong> - Email : ${user.email} - Phone : ${user.phone}
+                    <button onclick="loadUser('${user._id}')">Edit</button>
+                    <button onclick="deleteUser(event, '${user._id}')">Delete</button>`;
+                        container.appendChild(people);
+                    });
+                })
+        }
+
+        loadAllUsers();
+
+        function loadUser(id) {
+            console.log(id);
+            fetch(`/user/${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    const container = document.getElementById('updateUser');
+                    container.innerHTML = `
+                    <h3>Update ${data.name}'s'  Information</h3>
+                    <input type="text" name="" id="name" value='${data.name}'> <br> <br>
+                    <input type="email" name="" id="email" value='${data.email}'> <br> <br>
+                    <input type="tel" name="" id="phone" value='${data.phone}'> <br> <br>
+                    <button onClick="updateUser('${data._id}')">Update</button>
+                `;
+                })
+        }
+
+        function updateUser(id) {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const user = { name, email, phone, id }
+
+            fetch(`/update/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(user)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // console.log(data);
+                    if (data) {
+                        loadAllUsers();
+                        document.getElementById('updateUser').innerHTML = '';
+                    }
+                })
+        }
+
+        function deleteUser(event, id) {
+            // console.log(event.target.parentNode);
+            fetch(`/delete/${id}`, {
+                method : 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data){
+                    event.target.parentNode.style.display = 'none'
+                }
+            })
+        }
+    </script>
+</body>
+
+</html>
